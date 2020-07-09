@@ -1,24 +1,35 @@
 import React from 'react';
-import logo from './logo.svg';
+import { Machine } from 'xstate';
+import { useMachine } from '@xstate/react';
 import './App.css';
 
+const toggleMachine = Machine({
+  id: "toggleMachine",
+  initial: "inactive",
+  states: {
+    inactive: {
+      on: {
+        TOGGLE: "active"
+      }
+    },
+    active: {
+      on: {
+        TOGGLE: "inactive"
+      }
+    }
+  }
+});
+
 function App() {
+  const [current, send] = useMachine(toggleMachine);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div>
+        {current.matches('active') && <span>We are active!</span>}
+        {current.matches('inactive') && <span>We are inactive!</span>}
+      </div>
+      <button onClick={() => send('TOGGLE')}>Toggle</button>
     </div>
   );
 }
